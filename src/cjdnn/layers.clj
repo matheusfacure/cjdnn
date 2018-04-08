@@ -6,8 +6,16 @@
 
 (defn dense
   [input-shape neurons]
-   (let [W (rnd/sample-normal [input-shape neurons])]
-     (let [foreward (fn [z] (m/mmul z W))
-           backward (fn [d] (m/mmul d m/transpose W))
-       )
-     ))
+   (let [W (atom (rnd/sample-normal [input-shape neurons]))]
+     (let [foreword (fn [z] [(m/mmul z @W) z])
+           backward (fn [d] (m/mmul d (m/transpose @W)))
+           update!  (fn [lr d cache]
+                     (let [grad (-> cache
+                                    m/transpose
+                                    (m/mmul d)
+                                    (m/div (first (m/shape d)))
+                                    (m/mul lr))]
+                       (swap! m/sub grad)))]
+       {:foreword foreword
+        :backward backward
+        :update!  update!})))
