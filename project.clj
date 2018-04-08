@@ -5,7 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.csv "0.1.4"]
-                 [org.apache.commons/commons-math3 "3.2"]
                  [net.mikera/core.matrix "0.62.0"]]
   :main ^:skip-aot cjdnn.core
   :target-path "target/%s"
