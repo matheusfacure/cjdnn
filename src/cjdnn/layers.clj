@@ -3,8 +3,7 @@
             [clojure.core.matrix :as m]
             [cjdnn.activations :as act]))
 
-
-(defn dense
+(defn linear
   [input-shape neurons]
    (let [W (atom (rnd/sample-normal [input-shape neurons]))]
      (let [foreword (fn [z] [(m/mmul z @W) z])
@@ -19,3 +18,10 @@
        {:foreword foreword
         :backward backward
         :update!  update!})))
+
+
+(defn relu
+  []
+
+  {:foreword (fn [z] [(act/relu z) nil])
+   :backward act/d-relu})

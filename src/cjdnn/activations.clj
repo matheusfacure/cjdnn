@@ -7,6 +7,9 @@
   (let [activation #(max 0 %)]
     (m/emap activation tensor)))
 
+(defn d-relu
+  [tensor]
+  (m/eif (m/lt tensor 0) 0.0 1.0))
 
 (defn stable-logistic
   [x]
