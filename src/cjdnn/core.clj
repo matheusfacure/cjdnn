@@ -13,8 +13,6 @@
                        (map :foreword)                      ; get foreword fn for each layer
                        (reduce (fn [data-seq pass-foreword] ; make seq '([z0 cache0] ... [z_n cache_n])
                                  (let [z (-> data-seq first first)]
-                                   (print "\n" (m/shape z))
-                                   (print (m/shape (pass-foreword z)))
                                    (cons (pass-foreword z) data-seq))) ; one foreword pass iteration
                                (list [% nil])))             ; start iterating with net input and no cache
         backward #()
@@ -25,7 +23,7 @@
 
 
 (def data (reader/read-digits "mnist_dev.csv"))
-(def X (:x (reader/get-batch data 100)))
+(def X (:x (reader/get-batch data 20)))
 
 (def my-model (model (layers/linear 784 30)
                      (layers/relu)
@@ -33,7 +31,9 @@
                      (layers/relu)
                      (layers/linear 20 10)))
 
-(m/shape ((:foreword my-model) X))
+(def backward-cache ((:foreword my-model) X))
+
+(def last-layer (-> backward-cache first first))
 
 
 (defn -main

@@ -5,7 +5,7 @@
 
 (defn linear
   [input-shape neurons]
-   (let [W (atom (rnd/sample-normal [input-shape neurons]))]
+   (let [W (atom (m/scale (rnd/sample-normal [input-shape neurons]) 0.1))]
      (let [foreword (fn [z] [(m/mmul z @W) z])
            backward (fn [d] (m/mmul d (m/transpose @W)))
            update!  (fn [lr d cache]
@@ -22,6 +22,15 @@
 
 (defn relu
   []
-
   {:foreword (fn [z] [(act/relu z) nil])
    :backward act/d-relu})
+
+(defn sigmoid
+  []
+  {:foreword (fn [z] [(act/sigmoid z) nil])
+   :backward act/d-sigmoid})
+
+(defn softmax
+  []
+  {:foreword (fn [z] [(-> z m/rows act/softmax) nil])
+   :backward #()})

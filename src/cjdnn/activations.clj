@@ -11,16 +11,17 @@
   [tensor]
   (m/eif (m/lt tensor 0) 0.0 1.0))
 
-(defn stable-logistic
-  [x]
-  (if (>= 0)
-    (let [z (Math/exp (- x))]
-      (/ 1 (+ 1 z)))
-    (let [z (Math/exp x)]
-      (/ z (+ 1 z)))))
+(def sigmoid m/logistic)
 
-(defn sigmoid
+(defn d-sigmoid
   [tensor]
-  (let [activation stable-logistic]
-    (m/emap activation tensor)))
+  (m/emul (sigmoid tensor) (m/sub 1 (sigmoid tensor))))
 
+(defn softmax
+  [V]
+  (let [exps (->> V m/maximum (m/sub V) m/exp)]
+    (m/div exps (m/esum exps))))
+
+;def stable_softmax(X):
+;  exps = np.exp(X - np.max(X))
+;  return exps / np.sum(exps)
