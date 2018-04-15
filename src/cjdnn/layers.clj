@@ -24,13 +24,3 @@
   []
   {:foreword (fn [z] [(act/relu z) nil])
    :backward act/d-relu})
-
-(defn sigmoid
-  []
-  {:foreword (fn [z] [(act/sigmoid z) nil])
-   :backward act/d-sigmoid})
-
-(defn softmax
-  []
-  {:foreword (fn [z] [(-> z m/rows act/softmax) nil])
-   :backward #()})

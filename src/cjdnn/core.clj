@@ -3,7 +3,7 @@
     [cjdnn.reader :as reader]
     [cjdnn.activations :as act]
     [cjdnn.layers :as layers]
-    [clojure.core.reducers :as r]
+    [cjdnn.loss :as loss]
     [clojure.core.matrix :as m]
     [clojure.core.matrix.random :as rnd]))
 
@@ -24,12 +24,17 @@
 
 (def data (reader/read-digits "mnist_dev.csv"))
 (def X (:x (reader/get-batch data 20)))
+(def y (-> data
+           (reader/get-batch 20)
+           :y
+           (reader/one-hot-encode 10)))
 
 (def my-model (model (layers/linear 784 30)
                      (layers/relu)
                      (layers/linear 30 20)
                      (layers/relu)
-                     (layers/linear 20 10)))
+                     (layers/linear 20 10)
+                     (loss/softmax-cross-entropy)))
 
 (def backward-cache ((:foreword my-model) X))
 
