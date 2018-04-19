@@ -15,7 +15,19 @@
                                  (let [z (-> data-seq first first)]
                                    (cons (pass-foreword z) data-seq))) ; one foreword pass iteration
                                (list [% nil])))             ; start iterating with net input and no cache
-        backward #()
+
+        backward (fn [y-true y-hat]
+                   (let [loss-backward (-> layers last :backward)
+                         d0 (loss-backward y-true y-hat)]
+                     (->> layers
+                          reverse
+                          rest
+                          (map :backward)
+                          (reduce (fn [deriv-seq pass-backward]
+                                    (let [d (-> deriv-seq first)]
+                                      (cons (pass-backward d) deriv-seq)))
+                                  (list d0)))))
+
         update! #()]
     {:foreword foreword
      :backward backward
@@ -36,10 +48,19 @@
                      (layers/linear 20 10)
                      (loss/softmax-cross-entropy)))
 
+
+(def layers (list (layers/linear 784 30)
+                  (layers/relu)
+                  (layers/linear 30 20)
+                  (layers/relu)
+                  (layers/linear 20 10)
+                  (loss/softmax-cross-entropy)))
+
 (def backward-cache ((:foreword my-model) X))
 
-(def last-layer (-> backward-cache first first))
+(def y-hat (-> backward-cache first first))
 
+(def derivatives ((:backward my-model) y y-hat))
 
 (defn -main
   [& args]
